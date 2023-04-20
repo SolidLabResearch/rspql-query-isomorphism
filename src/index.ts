@@ -1,1 +1,2 @@
-console.log("Hello World!");
+export * from "./parser/RSPQLParser";
+export * from "./RSPQLEquivalence";

@@ -1,15 +1,18 @@
 {
-    "name": "insert-name-of-project-here",
+    "name": "rspql-query-equivalence",
     "version": "1.0.0",
-    "description": "insert-description-of-project-here",
+    "description": "A library to determine equivalence between two RSPQL queries. ",
     "main": "dist/index.js",
     "scripts": {
         "build": "npx tsc",
-        "start": "node dist/index.js",
         "test": "jest --coverage",
         "test:watch": "jest --watch"
     },
-    "keywords": [],
+    "keywords": [
+        "RSPQL",
+        "Query",
+        "Equivalence"
+    ],
     "author": "Kushagra Singh Bisen",
     "license": "ISC",
     "devDependencies": {
@@ -18,5 +21,11 @@
         "supertest": "^6.3.3",
         "ts-jest": "^29.0.3",
         "typescript": "^4.9.4"
+    },
+    "dependencies": {
+        "n3": "^1.16.4",
+        "rdf-data-factory": "^1.1.1",
+        "rdf-isomorphic": "^1.3.1",
+        "sparqljs": "^3.6.2"
     }
 }
