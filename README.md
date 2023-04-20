@@ -9,7 +9,7 @@ npm install rspql-query-equivalence
 ```
 Then, import the library in your code : 
 ```
-import { isEquivalent } from 'rspql-query-equivalence';
+import { is_equivalent } from 'rspql-query-equivalence';
 
 const query_one = `
     PREFIX : <https://rsp.js/>
