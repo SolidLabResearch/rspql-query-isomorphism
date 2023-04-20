@@ -1,6 +1,6 @@
 {
     "name": "rspql-query-equivalence",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "description": "A library to determine equivalence between two RSPQL queries. ",
     "main": "dist/index.js",
     "scripts": {

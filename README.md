@@ -29,7 +29,7 @@ const query_two = `
         WINDOW :w1 { ?sensor :value ?v ; :measurement: ?m }
     }`;
 
-const result = isEquivalent(query_one, query_two); // result = false
+const result = is_equivalent(query_one, query_two); // result = false
 ```
 
 
