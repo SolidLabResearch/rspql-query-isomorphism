@@ -14,32 +14,17 @@ export function is_equivalent(query_one: string, query_two: string): boolean {
     if (check_if_stream_parameters_are_equal(query_one_parsed, query_two_parsed) && check_if_window_name_are_equal(query_one_parsed, query_two_parsed)) {
         let query_one_bgp = generate_bgp_quads_from_query(query_one_parsed.sparql);
         let query_two_bgp = generate_bgp_quads_from_query(query_two_parsed.sparql);
-        if (check_if_queries_are_isomorphic(query_one_bgp, query_two_bgp)) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return check_if_queries_are_isomorphic(query_one_bgp, query_two_bgp) ? true : false;
     }
     return false;
 }
 
 function check_if_stream_parameters_are_equal(query_one_parsed: ParsedQuery, query_two_parsed: ParsedQuery) {
-    if (query_one_parsed.s2r[0].stream_name === query_two_parsed.s2r[0].stream_name && query_one_parsed.s2r[0].width === query_two_parsed.s2r[0].width && query_one_parsed.s2r[0].slide === query_two_parsed.s2r[0].slide) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return (query_one_parsed.s2r[0].stream_name === query_two_parsed.s2r[0].stream_name && query_one_parsed.s2r[0].width === query_two_parsed.s2r[0].width && query_one_parsed.s2r[0].slide === query_two_parsed.s2r[0].slide) ? true : false;
 }
 
 function check_if_window_name_are_equal(query_one_parsed: ParsedQuery, query_two_parsed: ParsedQuery) {
-    if (query_one_parsed.s2r[0].window_name === query_two_parsed.s2r[0].window_name) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return (query_one_parsed.s2r[0].window_name === query_two_parsed.s2r[0].window_name) ? true : false;
 }
 
 function generate_bgp_quads_from_query(query: string) {
