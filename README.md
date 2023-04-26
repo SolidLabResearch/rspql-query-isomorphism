@@ -31,7 +31,5 @@ const query_two = `
 
 const result = is_equivalent(query_one, query_two); // result = false
 ```
-
-
 ## License
-MIT License. Copyright (c) Kushagra Singh Bisen 2023. All rights reserved. 
+This code is copyrighted by [Ghent University - imec](https://www.ugent.be/ea/idlab/en) and released under the [MIT Licence](./LICENCE)
