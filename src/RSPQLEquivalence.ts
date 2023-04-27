@@ -10,11 +10,12 @@ export function is_equivalent(query_one: string, query_two: string): boolean {
 
     let query_one_parsed = parse(query_one);
     let query_two_parsed = parse(query_two);
-
-    if (check_if_stream_parameters_are_equal(query_one_parsed, query_two_parsed) && check_if_window_name_are_equal(query_one_parsed, query_two_parsed)) {
-        let query_one_bgp = generate_bgp_quads_from_query(query_one_parsed.sparql);
-        let query_two_bgp = generate_bgp_quads_from_query(query_two_parsed.sparql);
-        return check_if_queries_are_isomorphic(query_one_bgp, query_two_bgp) ? true : false;
+    if (check_projection_variables(query_one_parsed.projection_variables, query_two_parsed.projection_variables)) {
+        if (check_if_stream_parameters_are_equal(query_one_parsed, query_two_parsed) && check_if_window_name_are_equal(query_one_parsed, query_two_parsed)) {
+            let query_one_bgp = generate_bgp_quads_from_query(query_one_parsed.sparql);
+            let query_two_bgp = generate_bgp_quads_from_query(query_two_parsed.sparql);
+            return check_if_queries_are_isomorphic(query_one_bgp, query_two_bgp) ? true : false;
+        }
     }
     return false;
 }
@@ -50,6 +51,18 @@ function convert_to_graph(basic_graph_pattern: any) {
         graph.push(quad);
     }
     return graph;
+}
+
+function check_projection_variables(query_one_projection_variables: Array<string>, query_two_projection_variables: Array<string>) {
+    for (let i = 0; i < query_one_projection_variables.length; i++) {
+        if (!query_two_projection_variables.includes(query_one_projection_variables[i])) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
 }
 
 function check_if_queries_are_isomorphic(query_one: Quad[], query_two: Quad[]) {

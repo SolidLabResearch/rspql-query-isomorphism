@@ -1,9 +1,10 @@
 import { ParsedQuery } from "./ParsedQuery";
-
+const { Parser: SparqlParser } = require('sparqljs');
 let r2s: Map<string, string> = new Map<string, string>();
-let s2r: Array<string> = new Array<string>();
+let s2r: Array<string> = new Array<string>()
+let sparql_parser = new SparqlParser();
 
-export function parse(rspql_query: string): ParsedQuery {
+export function parse(rspql_query:string): ParsedQuery {
     let parsed = new ParsedQuery();
     let split = rspql_query.split(/\r?\n/);
     let sparqlLines = new Array<string>();
@@ -46,10 +47,11 @@ export function parse(rspql_query: string): ParsedQuery {
         }
     });
     parsed.sparql = sparqlLines.join("\n");
+    parse_sparql_query(parsed.sparql, parsed);
     return parsed;
 }
 
-function unwrap(prefixedIRI: string, prefixMapper: Map<string, string>) {
+export function unwrap(prefixedIRI: string, prefixMapper: Map<string, string>) {
     if (prefixedIRI.trim().startsWith("<")) {
         return prefixedIRI.trim().slice(1, -1);
     }
@@ -60,5 +62,19 @@ function unwrap(prefixedIRI: string, prefixMapper: Map<string, string>) {
     }
     else {
         return "";
+    }
+}
+
+export function parse_sparql_query(sparqlQuery: string, parsed: ParsedQuery) {
+    let parsed_sparql_query = sparql_parser.parse(sparqlQuery);
+    let prefixes = parsed_sparql_query.prefixes;
+    Object.keys(prefixes).forEach((key) => {
+        parsed.prefixes.set(key, prefixes[key]);
+    });
+    for (let i = 0; i <= parsed_sparql_query.variables.length; i++) {
+        if (parsed_sparql_query.variables[i] !== undefined) {
+            parsed.projection_variables.push(parsed_sparql_query.variables[i].variable.value);
+            parsed.aggregation_function = parsed_sparql_query.variables[i].expression.aggregation;
+        }
     }
 }
