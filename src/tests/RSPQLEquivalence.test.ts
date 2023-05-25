@@ -107,8 +107,9 @@ describe("testing_the_rspql_equivalennce", () => {
         SELECT (AVG(?o) AS ?averageHR1)
         FROM NAMED WINDOW :w1 ON STREAM <http://localhost:3000/dataset_participant1/data/> [RANGE 10 STEP 2]
         WHERE{
-            WINDOW :w1 { ?s saref:hasValue ?o .
-                         ?s saref:relatesToProperty dahccsensors:wearable.bvp .}
+            WINDOW :w1 {
+                         ?subject saref:relatesToProperty dahccsensors:wearable.bvp .
+                        ?subject saref:hasValue ?object . }
         }
         `
         expect(is_equivalent(query_one, query_two)).toBe(true);
@@ -160,6 +161,6 @@ describe("testing_the_rspql_equivalennce", () => {
                          ?s saref:relatesToProperty dahccsensors:wearable.bvp .}
         }
         `
-        expect(is_equivalent(query_one, query_two)).toBe(false);
+        expect(is_equivalent(query_one, query_two)).toBe(false);            
     });
 })
