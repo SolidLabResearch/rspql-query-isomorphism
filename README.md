@@ -2,6 +2,11 @@
 
 This is a library to determine equivalence between two RSPQL queries.
 
+## Coverage
+
+[![Coverage Status](https://img.shields.io/badge/coverage-98%25-brightgreen)](coverage.html)
+
+
 ## Usage
 Install the library using npm : 
 ```
