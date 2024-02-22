@@ -190,7 +190,20 @@ describe("testing_the_rspql_equivalennce", () => {
                         ?subject saref:hasValue ?object . }
         }
         `;
-
+        const query_three = `
+        PREFIX saref: <https://saref.etsi.org/core/> 
+        PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
+        PREFIX : <https://rsp.js/>
+        REGISTER RStream <output> AS
+        SELECT (AVG(?object) AS ?averageHR1)
+        FROM NAMED WINDOW :w1 ON STREAM <http://localhost:3000/dataset_participant1/data/> [RANGE 10 STEP 2]
+        WHERE{
+            WINDOW :w1 {
+                        ?subject ?p dahccsensors:wearable.heartRate .
+                        ?subject ?p ?object . }
+        }
+        `
         expect(is_equivalent(query_one, query_two)).toBe(true);
+        expect(is_equivalent(query_one, query_three)).toBe(false);
     });
 })
