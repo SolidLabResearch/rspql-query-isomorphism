@@ -1,2 +1,2 @@
 export * from "./parser/RSPQLParser";
-export * from "./RSPQLEquivalence";
+export * from "./equivalence/RSPQLEquivalence";

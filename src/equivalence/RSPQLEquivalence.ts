@@ -1,5 +1,5 @@
-import {ParsedQuery} from "./parser/ParsedQuery";
-import {parse} from "./parser/RSPQLParser";
+import {ParsedQuery} from "../parser/ParsedQuery";
+import {parse} from "../parser/RSPQLParser";
 import {DataFactory, Quad} from "rdf-data-factory";
 // import {BlankNode} from "n3";
 const factory = new DataFactory();
@@ -30,13 +30,13 @@ function check_if_window_name_are_equal(query_one_parsed: ParsedQuery, query_two
     return (query_one_parsed.s2r[0].window_name === query_two_parsed.s2r[0].window_name);
 }
 
-function generate_bgp_quads_from_query(query: string) {
+export function generate_bgp_quads_from_query(query: string) {
     let sparql_parsed = SPARQLParser.parse(query);
     let basic_graph_pattern = sparql_parsed.where[0].patterns[0].triples;
     return convert_to_graph(basic_graph_pattern);
 }
 
-function convert_to_graph(basic_graph_pattern: any) {
+export function convert_to_graph(basic_graph_pattern: any) {
     let graph: Quad[] = [];
     for (let i = 0; i < basic_graph_pattern.length; i++) {
         let subject = basic_graph_pattern[i].subject;
@@ -61,7 +61,6 @@ function check_projection_variables(query_one_projection_variables: Array<string
     for (let i = 0; i < query_one_projection_variables.length; i++) {
         return query_two_projection_variables.includes(query_one_projection_variables[i]);
     }
-
 }
 
 function check_if_queries_are_isomorphic(query_one: Quad[], query_two: Quad[]) {
