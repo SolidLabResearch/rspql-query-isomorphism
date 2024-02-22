@@ -1,6 +1,6 @@
 import { parse } from "./RSPQLParser";
 
-let simple_query = `PREFIX : <https://rsp.js/>
+const simple_query = `PREFIX : <https://rsp.js/>
     REGISTER RStream <output> AS
     SELECT (AVG(?v) as ?avgTemp)
     FROM NAMED WINDOW :w1 ON STREAM :stream1 [RANGE 10 STEP 2]
@@ -8,7 +8,7 @@ let simple_query = `PREFIX : <https://rsp.js/>
         WINDOW :w1 { ?sensor :value ?v ; :measurement: ?m }
     }`;
 
-let two_stream_query = `PREFIX : <https://rsp.js/>
+const two_stream_query = `PREFIX : <https://rsp.js/>
     REGISTER RStream <output> AS
     SELECT (AVG(?v) as ?avgTemp)
     FROM NAMED WINDOW :w1 ON STREAM :stream1 [RANGE 10 STEP 2]
@@ -17,21 +17,9 @@ let two_stream_query = `PREFIX : <https://rsp.js/>
         WINDOW :w1 { ?sensor :value ?v ; :measurement: ?m }
         WINDOW :w2 { ?sensor :value ?v ; :measurement: ?m }
     }`;
-let dahcc_query = `
-PREFIX saref: <https://saref.etsi.org/core/> 
-PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
-PREFIX : <https://rsp.js/>
-REGISTER RStream <output> AS
-SELECT (AVG(?object) AS ?averageHR1)
-FROM NAMED WINDOW :w1 ON STREAM <http://localhost:3000/dataset_participant2/data/> [RANGE 10 STEP 2]
-WHERE{
-    WINDOW :w1 { ?subject saref:hasValue ?object .
-                 ?subject saref:relatesToProperty dahccsensors:wearable.bvp .}
-}
-`;
 describe("RSPQLParser", () => {
     it('parsing a simple one stream RSPQL query', () => {
-        let parsed  = parse(simple_query);
+        const parsed = parse(simple_query);
         expect(parsed.sparql.replace(/\s/g, '')).toBe(`PREFIX : <https://rsp.js/>
         SELECT (AVG(?v) as ?avgTemp)
         WHERE{
@@ -44,7 +32,7 @@ describe("RSPQLParser", () => {
     });
 
     it('parsing a simple two stream RSPQL query', () => {
-        let parsed = parse(two_stream_query);
+        const parsed = parse(two_stream_query);
         expect(parsed.sparql.replace(/\s/g, '')).toBe(`PREFIX : <https://rsp.js/>
         SELECT (AVG(?v) as ?avgTemp)
         WHERE{
@@ -54,6 +42,6 @@ describe("RSPQLParser", () => {
         `.replace(/\s/g, ''));
         expect(parsed.r2s).toEqual({ operator: "RStream", name: "output" });
         expect(parsed.s2r[0]).toEqual({ window_name: "https://rsp.js/w1", stream_name: "https://rsp.js/stream1", width: 10, slide: 2 });
-        expect(parsed.s2r[1]).toEqual({ window_name: "https://rsp.js/w2", stream_name: "https://rsp.js/stream2", width: 15, slide: 5 });        
+        expect(parsed.s2r[1]).toEqual({ window_name: "https://rsp.js/w2", stream_name: "https://rsp.js/stream2", width: 15, slide: 5 });
     });
 });

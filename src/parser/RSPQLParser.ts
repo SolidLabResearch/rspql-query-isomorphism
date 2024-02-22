@@ -1,16 +1,19 @@
 import { ParsedQuery } from "./ParsedQuery";
 const { Parser: SparqlParser } = require('sparqljs');
-let r2s: Map<string, string> = new Map<string, string>();
-let s2r: Array<string> = new Array<string>()
-let sparql_parser = new SparqlParser();
+const sparql_parser = new SparqlParser();
 
-export function parse(rspql_query:string): ParsedQuery {
-    let parsed = new ParsedQuery();
-    let split = rspql_query.split(/\r?\n/);
-    let sparqlLines = new Array<string>();
-    let prefixMapper = new Map<string, string>();
+/**
+ * Parses the RSP-QL query and returns the parsed query object.
+ * @param {string} rspql_query - The RSP-QL query to be parsed.
+ * @returns {ParsedQuery} - The parsed query object.
+ */
+export function parse(rspql_query: string): ParsedQuery {
+    const parsed = new ParsedQuery();
+    const split = rspql_query.split(/\r?\n/);
+    const sparqlLines = new Array<string>();
+    const prefixMapper = new Map<string, string>();
     split.forEach((line) => {
-        let trimmed_line = line.trim();
+        const trimmed_line = line.trim();
         if (trimmed_line.startsWith("REGISTER")) {
             const regexp = /REGISTER +([^ ]+) +<([^>]+)> AS/g;
             const matches = trimmed_line.matchAll(regexp);
@@ -51,12 +54,18 @@ export function parse(rspql_query:string): ParsedQuery {
     return parsed;
 }
 
+/**
+ * Unwraps the prefixed IRI to the full IRI.
+ * @param {string} prefixedIRI - The prefixed IRI to be unwrapped.
+ * @param {Map<string, string>} prefixMapper - The prefix mapper.
+ * @returns {string} - The unwrapped IRI.
+ */
 export function unwrap(prefixedIRI: string, prefixMapper: Map<string, string>) {
     if (prefixedIRI.trim().startsWith("<")) {
         return prefixedIRI.trim().slice(1, -1);
     }
-    let split = prefixedIRI.trim().split(":");
-    let iri = split[0];
+    const split = prefixedIRI.trim().split(":");
+    const iri = split[0];
     if (prefixMapper.has(iri)) {
         return prefixMapper.get(iri) + split[1];
     }
@@ -65,9 +74,14 @@ export function unwrap(prefixedIRI: string, prefixMapper: Map<string, string>) {
     }
 }
 
+/**
+ * Parses the SPARQL query and adds the parsed information to the parsed query object.
+ * @param {string} sparqlQuery - The SPARQL query to be parsed.
+ * @param {ParsedQuery} parsed - The parsed query object.
+ */
 export function parse_sparql_query(sparqlQuery: string, parsed: ParsedQuery) {
-    let parsed_sparql_query = sparql_parser.parse(sparqlQuery);
-    let prefixes = parsed_sparql_query.prefixes;
+    const parsed_sparql_query = sparql_parser.parse(sparqlQuery);
+    const prefixes = parsed_sparql_query.prefixes;
     Object.keys(prefixes).forEach((key) => {
         parsed.prefixes.set(key, prefixes[key]);
     });

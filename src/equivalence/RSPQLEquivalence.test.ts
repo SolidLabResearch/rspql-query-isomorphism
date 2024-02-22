@@ -1,9 +1,9 @@
-import { convert_to_graph, is_equivalent } from "./RSPQLEquivalence";
+import { is_equivalent } from "./RSPQLEquivalence";
 
 describe("testing_the_rspql_equivalennce", () => {
 
     it("should_return_false_for_different_window_parameters", () => {
-        let query_one = `  
+        const query_one = `  
         PREFIX saref: <https://saref.etsi.org/core/> 
         PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
         PREFIX : <https://rsp.js/>
@@ -15,7 +15,7 @@ describe("testing_the_rspql_equivalennce", () => {
                          ?s saref:relatesToProperty dahccsensors:wearable.bvp .}
         }
         `
-        let query_two = `  
+        const query_two = `  
         PREFIX saref: <https://saref.etsi.org/core/> 
         PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
         PREFIX : <https://rsp.js/>
@@ -31,7 +31,7 @@ describe("testing_the_rspql_equivalennce", () => {
 
     })
     it("should_return_false_for_not_isomorphic_queries", () => {
-        let query_one = `  
+        const query_one = `  
         PREFIX saref: <https://saref.etsi.org/core/> 
         PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
         PREFIX : <https://rsp.js/>
@@ -43,7 +43,7 @@ describe("testing_the_rspql_equivalennce", () => {
                          ?s saref:relatesToProperty dahccsensors:wearable.bvp .}
         }
         `
-        let query_two = `  
+        const query_two = `  
         PREFIX saref: <https://saref.etsi.org/core/> 
         PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
         PREFIX : <https://rsp.js/>
@@ -58,7 +58,7 @@ describe("testing_the_rspql_equivalennce", () => {
 
     })
     it("should_return_false_for_different_queries_with_stream_name", () => {
-        let query_one = `  
+        const query_one = `  
         PREFIX saref: <https://saref.etsi.org/core/> 
         PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
         PREFIX : <https://rsp.js/>
@@ -71,7 +71,7 @@ describe("testing_the_rspql_equivalennce", () => {
         }
         `
 
-        let query_two = `  
+        const query_two = `  
         PREFIX saref: <https://saref.etsi.org/core/> 
         PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
         PREFIX : <https://rsp.js/>
@@ -87,7 +87,7 @@ describe("testing_the_rspql_equivalennce", () => {
     });
 
     it("should_return_true_for_equivalent_queries", () => {
-        let query_one = `  
+        const query_one = `  
         PREFIX saref: <https://saref.etsi.org/core/> 
         PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
         PREFIX : <https://rsp.js/>
@@ -99,7 +99,7 @@ describe("testing_the_rspql_equivalennce", () => {
                          ?s saref:relatesToProperty dahccsensors:wearable.bvp .}
         }
         `
-        let query_two = `  
+        const query_two = `  
         PREFIX saref: <https://saref.etsi.org/core/> 
         PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
         PREFIX : <https://rsp.js/>
@@ -135,9 +135,9 @@ describe("testing_the_rspql_equivalennce", () => {
     }`;
         expect(is_equivalent(query_one, query_two)).toBe(false);
     });
-    
+
     it('should_return_false_as_the_queries_are_equivalent_but_projection_variable_is_not', () => {
-        let query_one = `  
+        const query_one = `  
         PREFIX saref: <https://saref.etsi.org/core/> 
         PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
         PREFIX : <https://rsp.js/>
@@ -149,7 +149,7 @@ describe("testing_the_rspql_equivalennce", () => {
                          ?s saref:relatesToProperty dahccsensors:wearable.bvp .}
         }
         `
-        let query_two = `  
+        const query_two = `  
         PREFIX saref: <https://saref.etsi.org/core/> 
         PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
         PREFIX : <https://rsp.js/>
@@ -161,11 +161,11 @@ describe("testing_the_rspql_equivalennce", () => {
                          ?s saref:relatesToProperty dahccsensors:wearable.bvp .}
         }
         `
-        expect(is_equivalent(query_one, query_two)).toBe(false);            
+        expect(is_equivalent(query_one, query_two)).toBe(false);
     });
 
     it('test', () => {
-        let query_one = `
+        const query_one = `
         PREFIX saref: <https://saref.etsi.org/core/> 
         PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
         PREFIX : <https://rsp.js/>
@@ -177,7 +177,7 @@ describe("testing_the_rspql_equivalennce", () => {
                          ?s saref:relatesToProperty dahccsensors:wearable.heartRate . }
         }`;
 
-        let query_two = `
+        const query_two = `
         PREFIX saref: <https://saref.etsi.org/core/> 
         PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
         PREFIX : <https://rsp.js/>
