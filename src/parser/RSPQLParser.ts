@@ -1,94 +1,155 @@
-import { ParsedQuery } from "./ParsedQuery";
-const { Parser: SparqlParser } = require('sparqljs');
-const sparql_parser = new SparqlParser();
 
-/**
- * Parses the RSP-QL query and returns the parsed query object.
- * @param {string} rspql_query - The RSP-QL query to be parsed.
- * @returns {ParsedQuery} - The parsed query object.
- */
-export function parse(rspql_query: string): ParsedQuery {
-    const parsed = new ParsedQuery();
-    const split = rspql_query.split(/\r?\n/);
-    const sparqlLines = new Array<string>();
-    const prefixMapper = new Map<string, string>();
-    split.forEach((line) => {
-        const trimmed_line = line.trim();
-        if (trimmed_line.startsWith("REGISTER")) {
-            const regexp = /REGISTER +([^ ]+) +<([^>]+)> AS/g;
-            const matches = trimmed_line.matchAll(regexp);
-            for (const match of matches) {
-                if (match[1] === "RStream" || match[1] === "DStream" || match[1] === "IStream") {
-                    parsed.set_r2s({ operator: match[1], name: match[2] });
-                }
-            }
+import { Prefix, RSPQLQuery, SelectExpression, WindowSource, WherePattern } from "./Types";
+
+export class RSPQLParser {
+    parseAST(query: string): RSPQLQuery {
+        const prefixRegex = /PREFIX\s+(\w+):\s+<([^>]+)>/g;
+        const registerRegex = /REGISTER\s+RStream\s+<([^>]+)>/;
+        const selectRegex = /SELECT\s+\(([^)]+)\s+AS\s+(\?\w+)\)/;
+        const fromRegex = /FROM\s+NAMED\s+WINDOW\s+:(\w+)\s+ON\s+STREAM\s+<([^>]+)>\s+\[RANGE\s+(\d+)\s+STEP\s+(\d+)\]/g;
+        const whereRegex = /WINDOW\s+:(\w+)\s+{([^}]+)}/g;
+
+        let match;
+
+        // Extract PREFIXes
+        const prefixes: Prefix[] = [];
+        while ((match = prefixRegex.exec(query)) !== null) {
+            prefixes.push({ prefix: match[1], uri: match[2] });
         }
-        else if (trimmed_line.startsWith("FROM NAMED WINDOW")) {
-            const regexp = /FROM +NAMED +WINDOW +([^ ]+) +ON +STREAM +([^ ]+) +\[RANGE +([^ ]+) +STEP +([^ ]+)\]/g;
-            const matches = trimmed_line.matchAll(regexp);
-            for (const match of matches) {
-                parsed.add_s2r({
-                    window_name: unwrap(match[1], prefixMapper),
-                    stream_name: unwrap(match[2], prefixMapper),
-                    width: Number(match[3]),
-                    slide: Number(match[4])
+
+        // Extract REGISTER stream name
+        const registerStreamMatch = query.match(registerRegex);
+        const registerStream = registerStreamMatch ? registerStreamMatch[1] : "";
+
+        // Extract SELECT expression
+        const selectMatch = query.match(selectRegex);
+        const select: SelectExpression = selectMatch
+            ? { expression: selectMatch[1], alias: selectMatch[2] }
+            : { expression: "", alias: "" };
+
+        // Extract FROM NAMED WINDOW clauses
+        const fromNamedWindows: WindowSource[] = [];
+        while ((match = fromRegex.exec(query)) !== null) {
+            fromNamedWindows.push({
+                windowName: match[1],
+                stream: match[2],
+                range: parseInt(match[3], 10),
+                step: parseInt(match[4], 10),
+            });
+        }
+
+        // Extract WHERE clause patterns
+        const whereClauses: WherePattern[] = [];
+        while ((match = whereRegex.exec(query)) !== null) {
+            const windowName = match[1];
+            const patterns = match[2].trim().split("\n").map((s) => s.trim());
+            whereClauses.push({ window: windowName, patterns });
+        }
+
+        return {
+            prefixes,
+            registerStream,
+            select,
+            fromNamedWindows,
+            whereClauses,
+        };
+    }
+    parseToSMT(ast: RSPQLQuery): string {
+        let smt = "";
+
+        smt += `; SMT representation of RSP-QL query\n`;
+
+        smt += `; DECLARING VARIABLES\n`;
+        smt += `(declare-const ${ast.select.alias} Real) ; SELECT alias\n`;
+
+        const variableSet = new Set<string>();
+        const predicateSet = new Set<string>();
+
+        ast.whereClauses.forEach(where => {
+            where.patterns.forEach(pattern => {
+                const variables = pattern.match(/\?(\w+)/g);
+                if (variables) {
+                    variables.forEach(v => variableSet.add(v.replace("?", "")));
+                }
+
+                const predicates = pattern.match(/(\w+:\w+)/g);
+                if (predicates) {
+                    predicates.forEach(p => predicateSet.add(p.replace(":", "_")));
+                }
+            });
+        });
+
+        variableSet.forEach(variable => {
+            smt += `(declare-const ${variable} Real) ; Query variable\n`;
+        });
+
+        ast.fromNamedWindows.forEach(window => {
+            smt += `(declare-const ${window.windowName} (Array Int Real)) ; Stream: ${window.stream}\n`;
+        });
+
+        smt += `\n; DECLARING FUNCTIONS\n`;
+        predicateSet.forEach(predicate => {
+            smt += `(declare-fun ${predicate} (Real Real) Bool)\n`;
+        });
+
+        smt += `\n; ASSERTIONS\n`;
+        ast.whereClauses.forEach(where => {
+            smt += `; WINDOW ${where.window}\n`;
+            where.patterns.forEach(pattern => {
+                let formattedPattern = pattern
+                    .replace(/\?/g, "")
+                    .replace(/\s*\.\s*$/, "");
+
+                predicateSet.forEach(predicate => {
+                    const predRegex = new RegExp(`(\w+)\s+${predicate}\s+(\S+)`, "g");
+                    formattedPattern = formattedPattern.replace(predRegex, `(${predicate} $1 $2)`);
                 });
-            }
-        } else {
-            let sparqlLine = trimmed_line;
-            if (sparqlLine.startsWith("WINDOW")) {
-                sparqlLine = sparqlLine.replace("WINDOW", "GRAPH");
-            }
-            if (sparqlLine.startsWith("PREFIX")) {
-                const regexp = /PREFIX +([^:]*): +<([^>]+)>/g;
-                const matches = trimmed_line.matchAll(regexp);
-                for (const match of matches) {
-                    prefixMapper.set(match[1], match[2]);
-                }
-            }
-            sparqlLines.push(sparqlLine);
-        }
-    });
-    parsed.sparql = sparqlLines.join("\n");
-    parse_sparql_query(parsed.sparql, parsed);
-    return parsed;
-}
 
-/**
- * Unwraps the prefixed IRI to the full IRI.
- * @param {string} prefixedIRI - The prefixed IRI to be unwrapped.
- * @param {Map<string, string>} prefixMapper - The prefix mapper.
- * @returns {string} - The unwrapped IRI.
- */
-export function unwrap(prefixedIRI: string, prefixMapper: Map<string, string>) {
-    if (prefixedIRI.trim().startsWith("<")) {
-        return prefixedIRI.trim().slice(1, -1);
-    }
-    const split = prefixedIRI.trim().split(":");
-    const iri = split[0];
-    if (prefixMapper.has(iri)) {
-        return prefixMapper.get(iri) + split[1];
-    }
-    else {
-        return "";
+                smt += `(assert ${formattedPattern})\n`;
+            });
+        });
+
+        smt += `\n; CONSTRAINTS\n`;
+        smt += `(declare-const result Real) ; Computed result\n`;
+        smt += `(assert (= result (sqrt (+ ${Array.from(variableSet).map(v => `(* ${v} ${v})`).join(" ")}))))\n`;
+
+        return smt;
     }
 }
 
-/**
- * Parses the SPARQL query and adds the parsed information to the parsed query object.
- * @param {string} sparqlQuery - The SPARQL query to be parsed.
- * @param {ParsedQuery} parsed - The parsed query object.
- */
-export function parse_sparql_query(sparqlQuery: string, parsed: ParsedQuery) {
-    const parsed_sparql_query = sparql_parser.parse(sparqlQuery);
-    const prefixes = parsed_sparql_query.prefixes;
-    Object.keys(prefixes).forEach((key) => {
-        parsed.prefixes.set(key, prefixes[key]);
-    });
-    for (let i = 0; i <= parsed_sparql_query.variables.length; i++) {
-        if (parsed_sparql_query.variables[i] !== undefined) {
-            parsed.projection_variables.push(parsed_sparql_query.variables[i].variable.value);
-            parsed.aggregation_function = parsed_sparql_query.variables[i].expression.aggregation;
+
+// Example usage
+const query = `PREFIX saref: <https://saref.etsi.org/core/>
+    PREFIX func: <http://extension.org/functions#>
+    PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
+    PREFIX : <https://rsp.js/>
+    REGISTER RStream <output> AS
+    SELECT (func:sqrt(?o * ?o + ?o2 * ?o2 + ?o3 * ?o3) AS ?activityIndex)
+    FROM NAMED WINDOW :w1 ON STREAM <e> [RANGE 60000 STEP 20000]
+    FROM NAMED WINDOW :w2 ON STREAM <f> [RANGE 60000 STEP 20000]
+    FROM NAMED WINDOW :w3 ON STREAM <g> [RANGE 60000 STEP 20000]
+    WHERE {
+        WINDOW :w1 {
+            ?s saref:hasValue ?o .
+            ?s saref:relatesToProperty dahccsensors:wearable.acceleration.x .
         }
-    }
-}
+        WINDOW :w2 {
+            ?s saref:hasValue ?o2 .
+            ?s saref:relatesToProperty dahccsensors:wearable.acceleration.x .
+        }
+        WINDOW :w3 {
+            ?s saref:hasValue ?o3 .
+            ?s saref:relatesToProperty dahccsensors:wearable.acceleration.x .
+        }
+    }`;
+
+
+// Example usage
+const parser = new RSPQLParser();
+// console.log(parser.parseAST(query));
+console.log(parser.parseToSMT(parser.parseAST(query)));
+
+
+
+
+

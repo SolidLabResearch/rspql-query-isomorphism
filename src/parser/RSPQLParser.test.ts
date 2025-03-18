@@ -33,6 +33,7 @@ describe("RSPQLParser", () => {
 
     it('parsing a simple two stream RSPQL query', () => {
         const parsed = parse(two_stream_query);
+        parse(simple_query).set_sparql('Select * WHERE{?s ?p ?o}');
         expect(parsed.sparql.replace(/\s/g, '')).toBe(`PREFIX : <https://rsp.js/>
         SELECT (AVG(?v) as ?avgTemp)
         WHERE{
