@@ -40,4 +40,4 @@ const result = is_equivalent(query_one, query_two); // result = false
 This code is copyrighted by [Ghent University - imec](https://www.ugent.be/ea/idlab/en) and released under the [MIT Licence](./LICENCE)
 
 ## Contact
-For any questions, please contact [Kush](mailto:kushagrasingh.bisen@ugent.be). 
+For any questions, please contact [Kush](mailto:kushbisen@proton.me). 
