@@ -1,4 +1,4 @@
-import { is_equivalent } from "./RSPQLEquivalence";
+import { is_equivalent } from "./RSPQLIsomorphism";
 
 describe("testing_the_rspql_equivalennce", () => {
 

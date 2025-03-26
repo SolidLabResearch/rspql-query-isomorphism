@@ -11,5 +11,5 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
     "declaration": true
   },
-  "include": ["./src", "src/equivalence/RSPQLEquivalence.test.ts"]
+  "include": ["./src", "src/isomorphism/RSPQLIsomorphism.test.ts"]
 }
