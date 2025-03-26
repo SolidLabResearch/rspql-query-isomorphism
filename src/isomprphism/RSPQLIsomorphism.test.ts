@@ -1,6 +1,6 @@
-import { is_equivalent } from "./RSPQLEquivalence";
+import { is_isomorphic } from "./RSPQLIsomorphism";
 
-describe("testing_the_rspql_equivalennce", () => {
+describe("testing_the_rspql_isomorphism", () => {
 
     it("should_return_false_for_different_window_parameters", () => {
         const query_one = `  
@@ -27,7 +27,7 @@ describe("testing_the_rspql_equivalennce", () => {
                          ?s saref:relatesToProperty dahccsensors:wearable.bvp .}
         }
         `
-        expect(is_equivalent(query_one, query_two)).toBe(false);
+        expect(is_isomorphic(query_one, query_two)).toBe(false);
 
     })
     it("should_return_false_for_not_isomorphic_queries", () => {
@@ -54,7 +54,7 @@ describe("testing_the_rspql_equivalennce", () => {
             WINDOW :w1 { ?s saref:hasTimestamp ?timestamp .}
         }
         `
-        expect(is_equivalent(query_one, query_two)).toBe(false);
+        expect(is_isomorphic(query_one, query_two)).toBe(false);
 
     })
     it("should_return_false_for_different_queries_with_stream_name", () => {
@@ -83,10 +83,10 @@ describe("testing_the_rspql_equivalennce", () => {
                          ?s saref:relatesToProperty dahccsensors:wearable.bvp .}
         }
         `
-        expect(is_equivalent(query_one, query_two)).toBe(false);
+        expect(is_isomorphic(query_one, query_two)).toBe(false);
     });
 
-    it("should_return_true_for_equivalent_queries", () => {
+    it("should_return_true_for_isomorphic_queries", () => {
         const query_one = `  
         PREFIX saref: <https://saref.etsi.org/core/> 
         PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
@@ -112,7 +112,7 @@ describe("testing_the_rspql_equivalennce", () => {
                         ?subject saref:hasValue ?object . }
         }
         `
-        expect(is_equivalent(query_one, query_two)).toBe(true);
+        expect(is_isomorphic(query_one, query_two)).toBe(true);
     });
 
     it('should_return_false_for_a_non_dahcc_query', () => {
@@ -133,10 +133,10 @@ describe("testing_the_rspql_equivalennce", () => {
     WHERE{
         WINDOW :w1 { ?sensor :value ?v ; :measurement: ?m }
     }`;
-        expect(is_equivalent(query_one, query_two)).toBe(false);
+        expect(is_isomorphic(query_one, query_two)).toBe(false);
     });
 
-    it('should_return_false_as_the_queries_are_equivalent_but_projection_variable_is_not', () => {
+    it('should_return_false_as_the_queries_are_isomorphic_but_projection_variable_is_not', () => {
         const query_one = `  
         PREFIX saref: <https://saref.etsi.org/core/> 
         PREFIX dahccsensors: <https://dahcc.idlab.ugent.be/Homelab/SensorsAndActuators/>
@@ -161,7 +161,7 @@ describe("testing_the_rspql_equivalennce", () => {
                          ?s saref:relatesToProperty dahccsensors:wearable.bvp .}
         }
         `
-        expect(is_equivalent(query_one, query_two)).toBe(false);
+        expect(is_isomorphic(query_one, query_two)).toBe(false);
     });
 
     it('test', () => {
@@ -203,7 +203,7 @@ describe("testing_the_rspql_equivalennce", () => {
                         ?subject ?p ?object . }
         }
         `
-        expect(is_equivalent(query_one, query_two)).toBe(true);
-        expect(is_equivalent(query_one, query_three)).toBe(false);
+        expect(is_isomorphic(query_one, query_two)).toBe(true);
+        expect(is_isomorphic(query_one, query_three)).toBe(false);
     });
 })

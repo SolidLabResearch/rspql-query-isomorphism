@@ -1,7 +1,7 @@
 {
-    "name": "rspql-query-equivalence",
-    "version": "1.0.5",
-    "description": "A library to determine equivalence between two RSPQL queries. ",
+    "name": "rspql-query-isomorphism",
+    "version": "2.0.0",
+    "description": "A library to determine isomorphism relation between two RSPQL queries. ",
     "main": "dist/index.js",
     "scripts": {
         "build": "npx tsc",
@@ -12,7 +12,7 @@
     "keywords": [
         "RSPQL",
         "Query",
-        "Equivalence"
+        "Isomorphism"
     ],
     "author": "Kushagra Singh Bisen",
     "license": "ISC",

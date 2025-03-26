@@ -1,6 +1,6 @@
-# RSPQL Query Equivalence
+# RSPQL Query Isomorphism
 
-This is a library to determine equivalence between two RSPQL queries.
+This is a library to determine isomorphism relation between two RSPQL queries.
 
 ## Coverage
 
@@ -10,11 +10,11 @@ This is a library to determine equivalence between two RSPQL queries.
 ## Usage
 Install the library using npm : 
 ```
-npm install rspql-query-equivalence
+npm install rspql-query-isomorphism
 ```
 Then, import the library in your code : 
 ```
-import { is_equivalent } from 'rspql-query-equivalence';
+import { is_isomorphic } from 'rspql-query-isomorphism';
 
 const query_one = `
     PREFIX : <https://rsp.js/>
@@ -34,7 +34,7 @@ const query_two = `
         WINDOW :w1 { ?sensor :value ?v ; :measurement: ?m }
     }`;
 
-const result = is_equivalent(query_one, query_two); // result = false
+const result = is_isomorphic(query_one, query_two); // result = false
 ```
 ## License
 This code is copyrighted by [Ghent University - imec](https://www.ugent.be/ea/idlab/en) and released under the [MIT Licence](./LICENCE)

@@ -8,12 +8,12 @@ const sparqlParser = require('sparqljs').Parser;
 const SPARQLParser = new sparqlParser();
 
 /**
- * Check if two RSP-QL queries are equivalent to each other.
+ * Check if two RSP-QL queries are isomorphic to each other.
  * @param {string} query_one - The first RSP-QL query.
  * @param {string} query_two - The second RSP-QL query.
- * @returns {boolean} - True, if the queries are equivalent and False if they are not.
+ * @returns {boolean} - True, if the queries are isomorphic and False if they are not.
  */
-export function is_equivalent(query_one: string, query_two: string): boolean {
+export function is_isomorphic(query_one: string, query_two: string): boolean {
     const query_one_parsed = parse(query_one);
     const query_two_parsed = parse(query_two);
     if (check_projection_variables(query_one_parsed.projection_variables, query_two_parsed.projection_variables)) {
