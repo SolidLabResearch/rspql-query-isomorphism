@@ -1,8 +1,8 @@
-import {ParsedQuery} from "../parser/ParsedQuery";
-import {parse} from "../parser/RSPQLParser";
-import {DataFactory, Quad} from "rdf-data-factory";
+import { ParsedQuery } from "../parser/ParsedQuery";
+import { parse } from "../parser/RSPQLParser";
+import { DataFactory, Quad } from "rdf-data-factory";
 const factory = new DataFactory();
-import {isomorphic} from "rdf-isomorphic";
+import { isomorphic } from "rdf-isomorphic";
 
 const sparqlParser = require('sparqljs').Parser;
 const SPARQLParser = new sparqlParser();
@@ -16,12 +16,10 @@ const SPARQLParser = new sparqlParser();
 export function is_isomorphic(query_one: string, query_two: string): boolean {
     const query_one_parsed = parse(query_one);
     const query_two_parsed = parse(query_two);
-    if (check_projection_variables(query_one_parsed.projection_variables, query_two_parsed.projection_variables)) {
-        if (check_if_stream_parameters_are_equal(query_one_parsed, query_two_parsed) && check_if_window_name_are_equal(query_one_parsed, query_two_parsed)) {
-            const query_one_bgp = generate_bgp_quads_from_query(query_one_parsed.sparql);
-            const query_two_bgp = generate_bgp_quads_from_query(query_two_parsed.sparql);
-            return check_if_queries_are_isomorphic(query_one_bgp, query_two_bgp);
-        }
+    if (check_if_stream_parameters_are_equal(query_one_parsed, query_two_parsed) && check_if_window_name_are_equal(query_one_parsed, query_two_parsed)) {
+        const query_one_bgp = generate_bgp_quads_from_query(query_one_parsed.sparql);
+        const query_two_bgp = generate_bgp_quads_from_query(query_two_parsed.sparql);
+        return check_if_queries_are_isomorphic(query_one_bgp, query_two_bgp);
     }
     return false;
 }
@@ -81,18 +79,6 @@ export function convert_to_graph(basic_graph_pattern: any) {
         graph.push(quad);
     }
     return graph;
-}
-
-/**
- * Checks if the projection variables of the two queries are equal.
- * @param {Array<string>} query_one_projection_variables - The projection variables of the first query.
- * @param {Array<string>} query_two_projection_variables - The projection variables of the second query.
- * @returns {boolean} - True if the projection variables are equal, false otherwise.
- */
-function check_projection_variables(query_one_projection_variables: Array<string>, query_two_projection_variables: Array<string>) {
-    for (let i = 0; i < query_one_projection_variables.length; i++) {
-        return query_two_projection_variables.includes(query_one_projection_variables[i]);
-    }
 }
 
 /**
